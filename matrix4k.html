@@ -27,7 +27,7 @@ vec2 v=(gl_FragCoord.xy*2.-u.xy)/u.y,q;t=u.z;
 float s=mod(floor(t/12.8),3.),l=mod(t,12.8),k=exp(-4.*fract(t/.6)),z,a=sin(t*.2)*.3;
 v.x+=step(.8,H(vec2(floor(v.y*24.),floor(t*24.))))*.3*exp(-6.*l);
 v*=mat2(cos(a),sin(a),-sin(a),cos(a));vec3 c=vec3(0);
-if(s<1.)for(int i=0;i<12;i++){z=float(i)+1.-fract(t*.5);c+=L(v*z*3.+floor(t*.5)*7.-float(i)*7.+sin(t*.3),float(i)-floor(t*.5))*exp(-z*.3)*min(1.,z);}
+if(s<1.)for(int i=0;i<12;i++){z=float(i)+1.-fract(t*.5);c+=L(v*z*3.+(float(i)+floor(t*.5))*7.3+sin(t*.3),float(i)+floor(t*.5))*exp(-z*.3)*min(1.,z);}
 else if(s<2.){z=length(v);c=L(vec2(atan(v.y,v.x)*7.64,3./z+t*2.),1.)*min(1.,z*2.)+vec3(0,.3,.1)*exp(-z*5.)*(1.+k);}
 else{z=abs(v.y)+.02;c=L(vec2(v.x/z*2.,2./z+t*3.)+sign(v.y)*40.,2.)*min(1.,z*3.);}
 c*=(1.+k*.6)*min(1.,min(l,12.8-l)*2.)*(1.2-dot(v,v)*.25)*(.85+.15*sin(gl_FragCoord.y*3.));
