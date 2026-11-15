@@ -1,10 +1,16 @@
-# kb — 4k intro
+# kb — browser intros
 
-A [demoscene](https://en.wikipedia.org/wiki/Demoscene)-style intro in a single `index.html` under 4 KB.
-No assets, no libraries: graphics are one WebGL fragment shader, music is synthesised sample by sample at startup.
+[Demoscene](https://en.wikipedia.org/wiki/Demoscene)-style intros. Each is a single HTML file with no assets and no libraries:
+graphics and music are computed in the browser when you press play.
 
-- 4 scenes (gyroid tunnel, Kali fractal, cube field, folded IFS), beat-synced, ~61 s loop
-- Sine scroller, scanlines, vignette
-- Click to start, click again for fullscreen. `index.html#30` starts 30 s in.
+| Intro | File | Size | What it is |
+|---|---|---|---|
+| Matrix 256 | `matrix.html` | 256 B | Katakana digital rain |
+| Matrix 512 | `matrix512.html` | 512 B | Denser rain with bright heads; click for a bytebeat soundtrack |
+| kb 4k | `index.html` | 3.8 KB | Four shader scenes, sine scroller, synthesised music |
+| Meridian | `meridian/index.html` | 27 KB (64k class) | Six cinematic scenes with HDR bloom and a two-minute soundtrack |
+
+Controls: click to start. In `index.html` a second click goes fullscreen; in Meridian press `f` or double-click.
+`#30` on the URL starts 30 s in. Meridian renders at 720 lines by default; `?q=1080` raises it, `?q=480` helps slow GPUs.
 
 To publish: Settings → Pages → deploy from branch, root folder.
