@@ -1,0 +1,51 @@
+<!doctype html><title>kb 4k</title><body style="margin:0;background:#000;color:#fff;font:20px monospace;cursor:pointer" onclick=go()><canvas id=c style=position:fixed;width:100%;height:100%></canvas><p id=m style=position:fixed;width:100%;top:45%;text-align:center>[ click to start ]<script>
+go=_=>{go=_=>c.requestFullscreen();m.remove()
+// --- music: 32 bars @125bpm, rendered sample by sample ---
+A=new AudioContext;R=44100;L=61.44;N=R*L;B=A.createBuffer(1,N,R);D=B.getChannelData(0);E=new Float32Array(N);d=R*.36|0
+for(i=0;i<N;i++){t=i/R;s=t/.12;n=s|0;f=s-n;b=n>>4;k=s%4*.12
+r=[0,-4,3,-2][b&3];T=b&3?4:3;H=x=>6.283*t*55*2**((r+x)/12)
+p=H([0,T,7,12,7,T,12,19][n&7]+24)
+e=Math.sin(p+Math.sin(p*2)*(.5+b/16))*Math.exp(-f*3)*.13
+for(j of[0,T,7])e+=Math.sin(H(j+12)+Math.sin(t*3+j))*.03
+if(b>23)e+=Math.sin(H([12,7,T,7][n>>3&3]+36)+Math.sin(t*30)*.3)*.06
+E[i]=e+=(E[i-d]||0)*.45
+q=H(0);e+=Math.sin(q+Math.sin(q)*(1+f))*Math.min(1,k*4)*.35*(b>3)
+if(b>3&(b<16|b>19))e+=Math.sin(80*Math.sqrt(k))*Math.exp(-k*8)*.8
+if(b>7)e+=(Math.random()*2-1)*Math.exp(-f*(n&3^2?40:8))*.12
+D[i]=Math.tanh(e)}
+// --- gfx: one fragment shader, four scenes ---
+g=c.getContext`webgl`;P=g.createProgram()
+;[[35633,`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`],[35632,`precision highp float;uniform vec3 u;uniform sampler2D x;float t,S,k;
+mat2 R(float a){float c=cos(a),s=sin(a);return mat2(c,s,-s,c);}
+vec3 C(float x){return .5+.5*cos(6.283*(x+vec3(0,.33,.67)));}
+float M(vec3 p){
+if(S<1.){p.xy*=R(p.z*.1);return max(abs(dot(sin(p),cos(p.yzx)))-.1-k*.1,.7-length(p.xy))*.6;}
+if(S<3.){p=mod(p,4.)-2.;p.xy*=R(t);p.yz*=R(t*.7);return length(max(abs(p)-.5-k*.3,0.))-.1;}
+p.xz*=R(t*.3);p.xy*=R(t*.2);float s=1.;
+for(int i=0;i<5;i++){p=abs(p)-vec3(.9,.6,.4);p.xy*=R(.6+k*.1);p.yz*=R(.9);p*=1.4;s*=1.4;}
+return(length(max(abs(p)-.6,0.))-.05)/s;}
+void main(){
+vec2 q=gl_FragCoord.xy/u.xy,v=(q*2.-1.)*vec2(u.x/u.y,1);
+t=u.z;k=exp(-3.*fract(t/.48));S=mod(floor(t/15.36),4.);
+float l=mod(t,15.36),z=0.,h,g=0.;vec3 c=vec3(0);
+if(S==1.){vec2 w=v*R(t*.2)*(1.3-k*.1);
+for(int i=0;i<7;i++){w=abs(w)/dot(w,w)-vec2(.8+.2*sin(t*.2),.9);c+=C(length(w)*.15+t*.1)*exp(-9.*abs(w.y))*.4;}c*=c;
+}else{
+vec3 o=vec3(0,0,S<1.?t*2.:S<3.?t*4.:-7.),d=normalize(vec3(v,1.5));d.xy*=R(sin(t*.3)*.6);
+for(int i=0;i<90;i++){h=M(o+d*z);z+=h*.7;g+=.01/(.01+h*h);if(h<.001||z>40.)break;}
+vec3 p=o+d*z;vec2 e=vec2(.01,0);
+vec3 n=normalize(M(p)-vec3(M(p-e.xyy),M(p-e.yxy),M(p-e.yyx)));
+if(z<40.)c=C(p.z*.05+length(p.xy)*.1+S*.3)*(.2+max(dot(n,normalize(vec3(.5,.7,-.6))),0.)+pow(max(dot(reflect(d,n),vec3(.5,.7,-.6)),0.),9.))*exp(-z*.07);
+c+=C(t*.05+S*.3+.5)*g*(S<1.?.003:.01)*(1.+k);}
+h=(q.y-.09-.03*sin(q.x*9.+t*3.))*12.;
+if(h>0.&&h<1.)c+=texture2D(x,vec2(q.x*.6+t*.1,1.-h)).a*(C(q.x+t)+.3);
+c*=min(1.,min(l,15.36-l)*2.)*(1.2-dot(v,v)*.25)*(.9+.1*sin(gl_FragCoord.y*3.));
+gl_FragColor=vec4(sqrt(c),1);}`]].map(([y,z])=>{h=g.createShader(y);g.shaderSource(h,z);g.compileShader(h);g.attachShader(P,h)})
+g.linkProgram(P);g.useProgram(P);g.bindBuffer(34962,g.createBuffer());g.bufferData(34962,new Float32Array([-1,-1,3,-1,-1,3]),35044);g.enableVertexAttribArray(0);g.vertexAttribPointer(0,2,5126,0,0,0)
+// --- scroller text as a texture ---
+T=document.createElement`canvas`;T.width=2048;T.height=64;X=T.getContext`2d`;X.font='bold 44px monospace';X.fillStyle='#fff'
+X.fillText('KB 4K INTRO +++ CODE GFX MUSIC ALL PROCEDURAL +++ GREETS TO ALL SCENERS +++',0,48)
+g.bindTexture(3553,g.createTexture());g.texImage2D(3553,0,6408,6408,5121,T);g.texParameteri(3553,10241,9729)
+O=+location.hash.slice(1)||0;Z=A.createBufferSource();Z.buffer=B;Z.loop=1;Z.connect(A.destination);Z.start(0,O%L);O-=A.currentTime
+;(F=_=>{g.viewport(0,0,w=c.width=innerWidth,h=c.height=innerHeight);g.uniform3f(g.getUniformLocation(P,'u'),w,h,A.currentTime+O);g.drawArrays(4,0,3);requestAnimationFrame(F)})()}
+</script>
