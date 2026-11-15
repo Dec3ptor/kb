@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang=en>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>kb — browser intros</title>
+<style>
+:root{--bg:#07090c;--panel:#0d1116;--line:#1c242d;--text:#c9d3dc;--dim:#6f7c89;--hot:#5cf2a0}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+body{display:grid;grid-template-columns:320px 1fr;grid-template-rows:100%}
+nav{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column}
+header{padding:20px 20px 14px;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:18px;font-weight:600;letter-spacing:.2em;color:#fff}
+header p{margin:6px 0 0;color:var(--dim);font-size:12px}
+button.item{all:unset;box-sizing:border-box;display:block;width:100%;padding:13px 20px;border-bottom:1px solid var(--line);border-left:3px solid transparent;cursor:pointer}
+button.item:hover{background:#121820}
+button.item:focus-visible{outline:2px solid var(--hot);outline-offset:-2px}
+button.item[aria-current=true]{border-left-color:var(--hot);background:#121a1c}
+.item b{display:flex;justify-content:space-between;gap:10px;color:#fff;font-weight:600}
+.item b span{color:var(--hot);font-weight:400;white-space:nowrap}
+.item small{display:block;color:var(--dim);font-size:12px;margin-top:2px}
+main{display:flex;flex-direction:column;min-width:0;min-height:0}
+#bar{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--dim)}
+#bar strong{color:#fff;font-weight:600;margin-right:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bar a,#bar button{all:unset;cursor:pointer;color:var(--text);padding:4px 10px;border:1px solid var(--line);border-radius:4px;white-space:nowrap}
+#bar a:hover,#bar button:hover{border-color:var(--hot);color:var(--hot)}
+iframe{flex:1;width:100%;min-height:0;border:0;background:#000}
+footer{margin-top:auto;padding:14px 20px;color:var(--dim);font-size:11px}
+@media(max-width:760px){
+body{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+nav{border-right:0;border-bottom:1px solid var(--line);max-height:42vh}
+header{padding:12px 16px 10px}button.item{padding:9px 16px}footer{display:none}
+#bar span{display:none}
+}
+</style>
+<nav>
+<header><h1>KB INTROS</h1><p>Each one is a single file. No assets, no libraries — picture and sound are computed in your browser.</p></header>
+<div id=list></div>
+<footer>Pick one, then click inside the player to start it. Sound needs that click.</footer>
+</nav>
+<main>
+<div id=bar><strong id=name></strong><span>click the picture to start</span><button id=fs type=button>fullscreen</button><a id=open target=_blank rel=noopener>open alone ↗</a></div>
+<iframe id=stage title="Intro player" allow="fullscreen; autoplay"></iframe>
+</main>
+<script>
+const INTROS=[
+['meridian','Meridian','64k class · 27 KB','meridian/index.html','Six cinematic scenes with bloom and a two-minute soundtrack'],
+['matrix4k','Matrix 4k','3.3 KB','matrix4k.html','Fly through 3D glyph rain, a tunnel and a corridor, with music'],
+['neon','Neon 4k','3.0 KB','neon.html','Sunset grid, mountains and a synthwave loop'],
+['4k','kb 4k','3.8 KB','4k.html','Four raymarched shader scenes and a sine scroller'],
+['oldschool','Oldschool 1k','987 B','oldschool.html','Plasma, copper bars, sine scroller, bytebeat'],
+['matrix512','Matrix 512','512 B','matrix512.html','Dense katakana rain with bright heads and bytebeat'],
+['matrix','Matrix 256','256 B','matrix.html','Katakana rain in exactly 256 bytes']];
+const list=document.getElementById('list'),stage=document.getElementById('stage');
+function pick(id,push){
+  const it=INTROS.find(i=>i[0]==id)||INTROS[0];
+  for(const b of list.children)b.setAttribute('aria-current',b.dataset.id==it[0]);
+  stage.src=it[3];document.getElementById('name').textContent=it[1]+' — '+it[2];document.getElementById('open').href=it[3];
+  if(push)history.replaceState(null,'','#'+it[0]);
+}
+for(const[id,name,size,,desc]of INTROS){
+  const b=document.createElement('button');b.className='item';b.type='button';b.dataset.id=id;
+  b.innerHTML=`<b>${name}<span>${size}</span></b><small>${desc}</small>`;b.onclick=()=>pick(id,1);list.append(b);
+}
+document.getElementById('fs').onclick=()=>stage.requestFullscreen();
+addEventListener('hashchange',()=>pick(location.hash.slice(1)));
+pick(location.hash.slice(1));
+</script>
+</html>

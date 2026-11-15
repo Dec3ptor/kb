@@ -1,0 +1,41 @@
+<!doctype html><title>neon 4k</title><body style="margin:0;background:#000;color:#f6c;font:20px monospace;cursor:pointer" onclick=go()><canvas id=c style=position:fixed;width:100%;height:100%></canvas><p id=m style=position:fixed;width:100%;top:45%;text-align:center>[ press start ]<script>
+go=_=>{go=_=>c.requestFullscreen();m.remove()
+// --- music: 16 bars @110bpm, F G Am Am ---
+A=new AudioContext;R=44100;U=6/11/4;L=U*256;N=R*L|0;B=A.createBuffer(1,N,R);D=B.getChannelData(0);E=new Float32Array(N);d=R*U*3|0;S=Math.sin;X=Math.exp
+for(i=0;i<N;i++){t=i/R;s=t/U;n=s|0;f=s-n;b=n>>4;k=s%4*U
+r=[-4,-2,0,0][b&3];T=b&2?3:4;H=x=>6.283*t*55*2**((r+x)/12)
+p=H([0,T,7,12][n%3+(n>>2&1)]+24);e=(S(p)>0?.05:-.05)*X(-f*4)*(b>1)
+for(j of[0,T,7])e+=S(H(j+12)+S(H(j+12)+t)*.8)*.03
+if(b>7)p=H([7,7,12,T+12,14,12,7,T][n>>1&7]+24),e+=S(p+S(p*2)*.7+S(t*30)*.2)*.07
+E[i]=e+=(E[i-d]||0)*.4
+q=H(n&2?12:0);e+=S(q+S(q)*2*X(-f*3))*X(-f*1.5)*.3
+if(b>3)e+=S(80*Math.sqrt(k))*X(-k*8)*.8*Math.min(1,k*40)
+if(b>3&(n&7)==4)e+=(Math.random()*2-1)*X(-f*2.5)*.25
+e+=(Math.random()*2-1)*X(-f*(n&1?30:60))*.06
+D[i]=Math.tanh(e)}
+g=c.getContext`webgl`;P=g.createProgram()
+;[[35633,`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`],[35632,`precision highp float;uniform vec3 u;
+float H(vec2 p){return fract(sin(dot(p,vec2(12.9,78.2)))*43758.5);}
+float N(float x){float i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(H(vec2(i,1)),H(vec2(i+1.,1)),f);}
+void main(){
+vec2 v=(gl_FragCoord.xy*2.-u.xy)/u.y;float t=u.z,k=exp(-4.*fract(t/.5454)),y=v.y-.05+sin(t*.2)*.03,z,l,w;
+v.x+=sin(t*.15)*.2;vec3 c,P=vec3(1,.15,.55),Q=vec3(.1,.9,1);
+if(y>0.){
+c=mix(vec3(.75,.12,.45),vec3(.03,0,.13),pow(y,.45));
+vec2 g=floor(v*70.);c+=step(.985,H(g))*H(g+1.)*y*(.6+.4*sin(t*3.+g.x));
+vec2 s=v-vec2(0,.5);z=length(s);
+l=smoothstep(.43,.42,z)*step(sin(s.y*45.-t*2.)*.5+.5,s.y*2.2+1.05);
+c=mix(c,mix(P,vec3(1,.9,.2),s.y*1.3+.55)*1.3,l)+P*.12/(z+.15)*(1.+k*.4);
+w=(N(v.x*3.)*.3+N(v.x*11.)*.07)*smoothstep(.25,1.3,abs(v.x))+.01;
+c=mix(c,vec3(.04,0,.1)+Q*smoothstep(.012,0.,w-y)*.9,step(y,w));
+}else{
+z=1./(.02-y);vec2 p=vec2(v.x*z,z+t*4.),g=abs(fract(p)-.5);l=min(g.x,g.y);w=.02+z*.004;
+c=vec3(.03,0,.08)+P*(smoothstep(w,0.,l)+.25*smoothstep(w*6.,0.,l))*(1.+k);
+c+=vec3(1,.5,.2)*.25*exp(-abs(v.x)*4.)*(.6+.4*sin(z*3.-t*5.));
+c=mix(c,vec3(.75,.12,.45),1.-exp(-z*.035));}
+c*=(1.15-dot(v,v)*.2)*(.88+.12*sin(gl_FragCoord.y*3.))*min(1.,t*.5);
+gl_FragColor=vec4(sqrt(c),1);}`]].map(([y,z])=>{h=g.createShader(y);g.shaderSource(h,z);g.compileShader(h);g.attachShader(P,h)})
+g.linkProgram(P);g.useProgram(P);g.bindBuffer(34962,g.createBuffer());g.bufferData(34962,new Float32Array([-1,-1,3,-1,-1,3]),35044);g.enableVertexAttribArray(0);g.vertexAttribPointer(0,2,5126,0,0,0)
+O=+location.hash.slice(1)||0;Z=A.createBufferSource();Z.buffer=B;Z.loop=1;Z.connect(A.destination);Z.start(0,O%L);O-=A.currentTime
+;(F=_=>{g.viewport(0,0,w=c.width=innerWidth,h=c.height=innerHeight);g.uniform3f(g.getUniformLocation(P,'u'),w,h,A.currentTime+O);g.drawArrays(4,0,3);requestAnimationFrame(F)})()}
+</script>
